@@ -12,7 +12,16 @@ chrome.runtime.onInstalled.addListener(() => {
     recordingStatus: RecordingStatus.NOT_STARTED,
   });
   ChromeExtensionUtils.searchTabs({}).then(tabs => {
+    const excludedUrl = [
+      'chrome://',
+      'https://chrome.google.com/webstore',
+      'brave://extensions',
+      'http://localhost',
+      'https://chromewebstore.google.com/',
+    ];
     tabs.map((tab) => {
+      const isExculudedUrl = excludedUrl.some(url => (tab.url ?? '').startsWith(url));
+      if (isExculudedUrl) return false;
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ["contentScript.js"]
