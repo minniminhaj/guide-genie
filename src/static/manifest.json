@@ -1,0 +1,31 @@
+{
+  "name": "Guide Genie",
+  "description": "Guide Genie with AI!",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "icons": {
+    "16": "genie-icon-16x16.png",
+    "48": "genie-icon-48x48.png",
+    "128": "genie-icon-128x128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Guide Genie",
+    "default_icon": "genie-icon-16x16.png"
+  },
+  "permissions": ["storage", "activeTab", "tabs", "aiLanguageModelOriginTrial"],
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "trial_tokens": [
+    "AlCm83n3VUGm0yWXR6Eh0p+Zf72+RiMm8ENEXJjpWZMJG0qQUjWhyWhDg5WIj3aljU9WAYzl8wr8TIN18Fm6WgUAAABveyJvcmlnaW4iOiJjaHJvbWUtZXh0ZW5zaW9uOi8vZWVlb2RhZ25iZG1iZmNtb2xwamdkbWptZGdhbmdnYmMiLCJmZWF0dXJlIjoiVHJhbnNsYXRpb25BUEkiLCJleHBpcnkiOjE3NTMxNDI0MDB9"
+  ]
+}

@@ -1,0 +1,23 @@
+body {
+  background-color: #fff;
+  width: 250px;
+  height: 250px;
+  font-family: "Roboto";
+}
+.popup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.popup-root {
+  height: 100%;
+}
+.popup-logo {
+  margin-bottom: 10px;
+}
+button {
+  border-radius: 25px;
+  color: #fff;
+}
