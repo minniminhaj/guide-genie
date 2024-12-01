@@ -139,9 +139,9 @@ const App: React.FC<{}> = () => {
     });
     setSteps(steps);
     try {
-      // @ts-ignore
+      //@ts-ignore
       const session = await (ai as any).languageModel.create({
-        systemPrompt: "Alway generate a step by step guide in JSON format",
+        systemPrompt: `Alway generate a step by step guide in JSON format { "guideTitle": "string", "guideDescription": "string", "steps": [ { "title": "string", "description": "string" } ] }`,
       });
       const stepsWithoutImg = steps.map(
         ({ title, eventType, tagName, pageTitle, pageDescription, domain }: any) => ({
@@ -157,7 +157,7 @@ const App: React.FC<{}> = () => {
       const result = await session.prompt(` 
 Generate a step-by-step guide from the provided JSON. Each interaction in the input must correspond exactly to one step in the output. The number of steps in the output must match the number of interactions in the input JSON which is ${
         steps.length
-      } in total, with each step corresponding to the interaction at the same index of input. Write a detailed title & description for each step that explains the user's action based on the interaction, including details such as eventType, tagName, domain, and pageUrl. Ensure the description is specific and relevant to the interaction. Do not skip any interactions or add extra steps.
+      } in total, with each step corresponding to the interaction at the same index of input. Write a detailed title & description for each step that explains the user's action based on the interaction, including details such as eventType, domain, and pageUrl. Ensure the description is specific and relevant to the interaction. Do not skip any interactions or add extra steps.
 Return only the following JSON structure as the output: { "guideTitle": "string", "guideDescription": "string", "steps": [ { "title": "string", "description": "string" } ] }
     
     ${JSON.stringify(stepsWithoutImg)}`);

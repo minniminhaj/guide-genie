@@ -11,6 +11,18 @@ chrome.runtime.onInstalled.addListener(() => {
     steps: [],
     recordingStatus: RecordingStatus.NOT_STARTED,
   });
+  ChromeExtensionUtils.searchTabs({}).then(tabs => {
+    tabs.map((tab) => {
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ["contentScript.js"]
+      })
+      // chrome.scripting.insertCSS({
+      //   target: { tabId: tab.id },
+      //   files: ["contentScript.js"]
+      // })
+    })
+  })
 })
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
