@@ -42,3 +42,15 @@ body {
   gap: 12px;
   /* margin: 0 30px; */
 }
+.snackbar {
+  padding: 12px 24px;
+  border-radius: 5px;
+  color: #fff;
+}
+.snackbar.error {
+  background-color: rgb(220, 84, 84);
+}
+
+.snackbar.success {
+  background-color: rgb(66, 208, 66);
+}

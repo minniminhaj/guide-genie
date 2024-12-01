@@ -26,6 +26,8 @@ import Skeleton from "react-loading-skeleton";
 import Header from "./components/Header";
 import Steps from "./components/Steps";
 import { downloadFullScreenshot, processGuide } from "./util";
+import { Snackbar } from "@material-ui/core";
+
 const App: React.FC<{}> = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [downloading, setDownloading] = useState<boolean>(null);
@@ -33,8 +35,12 @@ const App: React.FC<{}> = () => {
   const [orgSteps, setOrgSteps] = useState([]);
   const [guide, setGuide] = useState(null);
   const [translatationSupport, setTranslationSupport] = useState<boolean>(true);
-  const [aiGenSupport, setAiGenSupport] = useState<boolean>(true);
   const [orgGuide, setOrgGuide] = useState(null);
+  const [snackbarState, setSnackbarState] = useState({
+    open: false,
+    severity: "success",
+    message: "",
+  });
   const languageList = [
     { label: "en", display: "English" },
     { label: "es", display: "Spanish" },
@@ -61,6 +67,7 @@ const App: React.FC<{}> = () => {
     setIsLoading(true);
     const updatedSteps = orgSteps.map(({ title, description }) => ({ title, description }));
     try {
+      console.time("Translator API Time:");
       const {
         steps: processedSteps,
         guideDescription,
@@ -73,6 +80,7 @@ const App: React.FC<{}> = () => {
         },
         event.label
       );
+      console.timeEnd("Translator API Time:");
       setSteps((steps) =>
         steps.map((step, index) => ({
           ...step,
@@ -83,8 +91,13 @@ const App: React.FC<{}> = () => {
       setGuide({ guideDescription, guideTitle });
       setIsLoading(false);
     } catch (error) {
-      console.error("Language Translation API Failed:" + error);
-      setIsLoading(true);
+      setSnackbarState({
+        open: true,
+        message: "Gemini nano translator API failed, please enable the API",
+        severity: "error",
+      });
+      console.error("Translator API Failed:" + error);
+      setIsLoading(false);
     }
   };
 
@@ -125,29 +138,22 @@ const App: React.FC<{}> = () => {
       guideDescription: "Provides detail overview of step ",
     });
     setSteps(steps);
-    // @ts-ignore
-    const aiAvailable = (await ai.languageModel?.capabilities()).available;
-    if (aiAvailable !== "readily") {
-      setAiGenSupport(false);
-      setIsLoading(false);
-      return;
-    }
-    // @ts-ignore
-    const session = await (ai as any).languageModel.create({
-      systemPrompt: "Alway generate a step by step guide in JSON format",
-    });
-    const stepsWithoutImg = steps.map(
-      ({ title, eventType, tagName, pageTitle, pageDescription, domain }: any) => ({
-        title,
-        domain,
-        eventType,
-        tagName,
-        pageTitle,
-        pageDescription,
-      })
-    );
-    console.time("AI");
     try {
+      // @ts-ignore
+      const session = await (ai as any).languageModel.create({
+        systemPrompt: "Alway generate a step by step guide in JSON format",
+      });
+      const stepsWithoutImg = steps.map(
+        ({ title, eventType, tagName, pageTitle, pageDescription, domain }: any) => ({
+          title,
+          domain,
+          eventType,
+          tagName,
+          pageTitle,
+          pageDescription,
+        })
+      );
+      console.time("PROMPT API Time:");
       const result = await session.prompt(` 
 Generate a step-by-step guide from the provided JSON. Each interaction in the input must correspond exactly to one step in the output. The number of steps in the output must match the number of interactions in the input JSON which is ${
         steps.length
@@ -155,7 +161,7 @@ Generate a step-by-step guide from the provided JSON. Each interaction in the in
 Return only the following JSON structure as the output: { "guideTitle": "string", "guideDescription": "string", "steps": [ { "title": "string", "description": "string" } ] }
     
     ${JSON.stringify(stepsWithoutImg)}`);
-      console.timeEnd("AI");
+      console.timeEnd("PROMPT API Time:");
       console.log(result);
       const { guideTitle, guideDescription, steps: updatedSteps } = JSON.parse(result);
       console.log(updatedSteps);
@@ -170,14 +176,18 @@ Return only the following JSON structure as the output: { "guideTitle": "string"
       setOrgSteps(stepsWithAIContent);
       setOrgGuide({ guideTitle, guideDescription });
     } catch (error) {
-      console.error("NOT AI GENERATED STEPS, ERROR:" + error);
+      setSnackbarState({
+        open: true,
+        message: "Gemini nano prompt API failed, please enable the API",
+        severity: "error",
+      });
+      console.error("PROMPT API Failed:" + error);
       setIsLoading(false);
     }
     setIsLoading(false);
   };
 
   const handleDownload = async (event) => {
-    console.log(event);
     setDownloading(true);
     switch (event.label) {
       case "png":
@@ -201,7 +211,9 @@ Return only the following JSON structure as the output: { "guideTitle": "string"
     }
     setDownloading(false);
   };
-
+  const handleSnackbarClose = () => {
+    setSnackbarState({ open: false, message: "", severity: "success" });
+  };
   const getHeader = () => {
     if (isLoading) {
       return (
@@ -232,6 +244,12 @@ Return only the following JSON structure as the output: { "guideTitle": "string"
         <div className="guide-header">{getHeader()}</div>
         <Steps loading={isLoading} steps={steps} />
       </div>
+      <Snackbar open={snackbarState.open} autoHideDuration={4000} onClose={handleSnackbarClose}>
+        {/* <Alert onClose={handleSnackbarClose} severity={snackbarState.severity}>
+          This is a success message!
+        </Alert> */}
+        <div className={`snackbar ${snackbarState.severity}`}>{snackbarState.message}</div>
+      </Snackbar>
     </div>
   );
 };
