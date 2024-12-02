@@ -141,7 +141,7 @@ const App: React.FC<{}> = () => {
     try {
       //@ts-ignore
       const session = await (ai as any).languageModel.create({
-        systemPrompt: `Generate a step-by-step guide from the provided JSON input, ensuring the output strictly matches the expected format. The output must contain exactly ${steps.length} steps, matching the number and order of interactions in the input. Each step must align with the interaction at the same index and context. The output format is as follows: { "guideTitle": "string", "guideDescription": "string", "steps": [ { "title": "string", "description": "string" } ] }. Ensure relevance, accuracy, and strict adherence to this format.`,
+        systemPrompt: `Generate a step-by-step guide from the provided JSON input, ensuring the output contains exactly ${steps.length} steps, matching the number and order of interactions in the input. Each step must correspond to its respective interaction, processing it based on the eventType (e.g., navigation, click) and incorporating relevant properties such as domain, eventType, pageDescription, pageIcon, pageTitle, pageUrl, tagName, and title. Ensure that the length of the steps array matches exactly the number of interactions provided in the input JSON and that the descriptions reflect the specific actions and context of each interaction. The output should strictly follow this JSON format without json markings: {"guideTitle": "string","guideDescription":"string","steps":[{"title": "string", "description": "string"}]}`,
       });
       const stepsWithoutImg = steps.map(
         ({ title, eventType, tagName, pageTitle, pageDescription, domain }: any) => ({
