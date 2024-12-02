@@ -141,7 +141,7 @@ const App: React.FC<{}> = () => {
     try {
       //@ts-ignore
       const session = await (ai as any).languageModel.create({
-        systemPrompt: `Alway generate a step by step guide in JSON format { "guideTitle": "string", "guideDescription": "string", "steps": [ { "title": "string", "description": "string" } ] }`,
+        systemPrompt: `Generate a step-by-step guide from the provided JSON input, ensuring the output strictly matches the expected format. The output must contain exactly ${steps.length} steps, matching the number and order of interactions in the input. Each step must align with the interaction at the same index and context. The output format is as follows: { "guideTitle": "string", "guideDescription": "string", "steps": [ { "title": "string", "description": "string" } ] }. Ensure relevance, accuracy, and strict adherence to this format.`,
       });
       const stepsWithoutImg = steps.map(
         ({ title, eventType, tagName, pageTitle, pageDescription, domain }: any) => ({
@@ -154,13 +154,7 @@ const App: React.FC<{}> = () => {
         })
       );
       console.time("PROMPT API Time:");
-      const result = await session.prompt(` 
-Generate a step-by-step guide from the provided JSON. Each interaction in the input must correspond exactly to one step in the output. The number of steps in the output must match the number of interactions in the input JSON which is ${
-        steps.length
-      } in total, with each step corresponding to the interaction at the same index of input. Write a detailed title & description for each step that explains the user's action based on the interaction, including details such as eventType, domain, and pageUrl. Ensure the description is specific and relevant to the interaction. Do not skip any interactions or add extra steps.
-Return only the following JSON structure as the output: { "guideTitle": "string", "guideDescription": "string", "steps": [ { "title": "string", "description": "string" } ] }
-    
-    ${JSON.stringify(stepsWithoutImg)}`);
+      const result = await session.prompt(JSON.stringify(stepsWithoutImg));
       console.timeEnd("PROMPT API Time:");
       console.log(result);
       const { guideTitle, guideDescription, steps: updatedSteps } = JSON.parse(result);
@@ -240,10 +234,14 @@ Return only the following JSON structure as the output: { "guideTitle": "string"
         isLoading={isLoading}
         selectedLang={selectedLang}
       />
-      <div className="guide">
-        <div className="guide-header">{getHeader()}</div>
-        <Steps loading={isLoading} steps={steps} />
-      </div>
+      {steps.length || isLoading ? (
+        <div className="guide">
+          <div className="guide-header">{getHeader()}</div>
+          <Steps loading={isLoading} steps={steps} />
+        </div>
+      ) : (
+        <h2 className="no-steps-title">No Steps added</h2>
+      )}
       <Snackbar open={snackbarState.open} autoHideDuration={4000} onClose={handleSnackbarClose}>
         {/* <Alert onClose={handleSnackbarClose} severity={snackbarState.severity}>
           This is a success message!

@@ -54,3 +54,6 @@ body {
 .snackbar.success {
   background-color: rgb(66, 208, 66);
 }
+.no-steps-title {
+  text-align: center;
+}
