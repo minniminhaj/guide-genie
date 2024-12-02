@@ -42,7 +42,7 @@ export default ({ data, stepNumber, loading }) => {
       {getStepInfo(data)}
       {data.eventType !== "navigation" && (
         <div className="step-img-wrapper">
-          <img onLoad={handleImageLoad} src={data.imgUri} alt="Step card" />
+          {data.imgUri && <img onLoad={handleImageLoad} src={data.imgUri} alt="Step card" />}
           {pointerCoordinates && (
             <span
               style={{

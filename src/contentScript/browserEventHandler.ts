@@ -145,7 +145,7 @@ export class BrowserEventListenerHandler {
 
     static mapStepTitleName(payload: any, e: any) {
         const mapper: any = {
-            BUTTON: () => 'Click here',
+            BUTTON: () => `Click on ${e.target.textContent} Button`,
             TEXTAREA: () => {
                 if (payload.eventType === StepEventTypes.BLUR) {
                     return `Type ${payload.placeholder} field`;
@@ -163,6 +163,8 @@ export class BrowserEventListenerHandler {
                 return 'Click on text field ' + payload?.placeholder;
             },
             SELECT: () => 'Select from this dropdown',
+            IMG: () => `Click on ${e.target.alt}`,
+            A: () => `Navigate to different page by clicking here`
         };
         if (e.target?.tagName && mapper[e.target?.tagName]) {
             return mapper[e.target?.tagName]();

@@ -141,7 +141,7 @@ const App: React.FC<{}> = () => {
     try {
       //@ts-ignore
       const session = await (ai as any).languageModel.create({
-        systemPrompt: `Generate a step-by-step guide from the provided JSON input, ensuring the output contains exactly ${steps.length} steps, matching the number and order of interactions in the input. Each step must correspond to its respective interaction, processing it based on the eventType (e.g., navigation, click) and incorporating relevant properties such as domain, eventType, pageDescription, pageIcon, pageTitle, pageUrl, tagName, and title. Ensure that the length of the steps array matches exactly the number of interactions provided in the input JSON and that the descriptions reflect the specific actions and context of each interaction. The output should strictly follow this JSON format without json markings: {"guideTitle": "string","guideDescription":"string","steps":[{"title": "string", "description": "string"}]}`,
+        systemPrompt: `Generate a step-by-step guide from the provided JSON input, ensuring the output contains exactly ${steps.length} steps, matching the number and order of interactions in the input. Each step must correspond to its respective interaction, processing it based on the eventType (e.g., navigation, click) and incorporating relevant properties such as title, domain, eventType, pageDescription, pageTitle, pageUrl, tagName, and title. Ensure that the length of the steps array matches exactly the number of interactions provided in the input JSON and that the descriptions reflect the specific actions and context of each interaction. The output should strictly follow this JSON format without markings: {"guideTitle": "string","guideDescription":"string","steps":[{"title": "string", "description": "string"}]}`,
       });
       const stepsWithoutImg = steps.map(
         ({ title, eventType, tagName, pageTitle, pageDescription, domain }: any) => ({
@@ -234,13 +234,13 @@ const App: React.FC<{}> = () => {
         isLoading={isLoading}
         selectedLang={selectedLang}
       />
-      {steps.length || isLoading ? (
+      {steps.length ? (
         <div className="guide">
           <div className="guide-header">{getHeader()}</div>
           <Steps loading={isLoading} steps={steps} />
         </div>
       ) : (
-        <h2 className="no-steps-title">No Steps added</h2>
+        <h2 className="no-steps-title"> {!isLoading ? "No Steps added" : ""}</h2>
       )}
       <Snackbar open={snackbarState.open} autoHideDuration={4000} onClose={handleSnackbarClose}>
         {/* <Alert onClose={handleSnackbarClose} severity={snackbarState.severity}>
