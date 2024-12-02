@@ -154,7 +154,7 @@ const App: React.FC<{}> = () => {
         })
       );
       console.time("PROMPT API Time:");
-      const result = await session.prompt(JSON.stringify(stepsWithoutImg));
+      const result = await session.prompt(`${JSON.stringify(stepsWithoutImg)}`);
       console.timeEnd("PROMPT API Time:");
       console.log(result);
       const { guideTitle, guideDescription, steps: updatedSteps } = JSON.parse(result);
